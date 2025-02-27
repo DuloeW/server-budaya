@@ -1,5 +1,11 @@
 import { serve } from '@hono/node-server'
-import app from './routes/route.js'
+import { Hono } from 'hono'
+import userRoute from './routes/route.js'
+
+const app = new Hono()
+
+app.route('/', userRoute)
+
 serve({
   fetch: app.fetch,
   port: 3000

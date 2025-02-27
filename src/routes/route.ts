@@ -1,28 +1,27 @@
 import 'dotenv/config'
 import { Hono } from 'hono'
 import { prettyJSON } from 'hono/pretty-json'
-import { addData, getAllData } from '../controller/controller.js'
-import { expiredIn, payload, type Variables } from '../utils/tool.js'
-import { sign } from 'hono/jwt';
+import { type Variables } from '../utils/tool.js'
 import { logger } from 'hono/logger';
-import { basicAuth } from 'hono/basic-auth';
-import { use } from 'hono/jsx';
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { HTTPException } from 'hono/http-exception';
-import { getCookie, setCookie } from 'hono/cookie';
+import { getCookie } from 'hono/cookie';
 import { bearerAuth } from 'hono/bearer-auth';
+import authRoute from './auth.route.js'
+import userRoute from './user.route.js'
 
-const app = new Hono<{Variables: Variables}>
+const router = new Hono<{Variables: Variables}>
 
-app.use(prettyJSON())
-app.use(logger())
+router.use(prettyJSON())
+router.use(logger())
+
 
 const BASE_URL = '/api'
 const BASE_URL_AUTH = '/api/auth'
 
+
 //MIDDLEWARE
-app.use(`${BASE_URL_AUTH}/*`, 
+router.use(`${BASE_URL_AUTH}/*`, 
     bearerAuth({
         verifyToken: async (token, c) => {
             return token === getCookie(c, 'token')
@@ -30,27 +29,7 @@ app.use(`${BASE_URL_AUTH}/*`,
     })
 )
 
-app.get(`${BASE_URL_AUTH}/`, (c: any) => getAllData(c))
+router.route(`${BASE_URL}/`, authRoute)
+router.route(`${BASE_URL_AUTH}/`, userRoute)
 
-app.post(`${BASE_URL_AUTH}/cuki/add`, (c: any) => addData(c))
-
-app.get(`${BASE_URL_AUTH}/products`, (c: any) => {
-    return c.json({ message: 'List message!' })
-})
-
-
-// DONT USE MIDDLERWARE
-app.post(`${BASE_URL}/login`, async (c: any) => {
-    const {username, password} = await c.req.json()
-     
-    const secreet = process.env.SECREET_KEY!
-
-    if(username !== 'admin' || password !== 'admin') {
-        throw new HTTPException(401, { message: 'Invalid username or password' })
-    } 
-    const token = await sign(payload(username, expiredIn), secreet)
-    setCookie(c, 'token', token)
-    return c.json({ token })
-})
-
-export default app
+export default router
