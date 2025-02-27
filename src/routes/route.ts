@@ -3,12 +3,13 @@ import { Hono } from 'hono'
 import { prettyJSON } from 'hono/pretty-json'
 import { type Variables } from '../utils/tool.js'
 import { logger } from 'hono/logger';
-import { zValidator } from '@hono/zod-validator'
-import { z } from 'zod'
 import { getCookie } from 'hono/cookie';
 import { bearerAuth } from 'hono/bearer-auth';
+
 import authRoute from './auth.route.js'
 import userRoute from './user.route.js'
+import categoryRoute from './category.route.js';
+import summaryRoute from './summary.route.js';
 
 const router = new Hono<{Variables: Variables}>
 
@@ -31,5 +32,7 @@ router.use(`${BASE_URL_AUTH}/*`,
 
 router.route(`${BASE_URL}/`, authRoute)
 router.route(`${BASE_URL_AUTH}/`, userRoute)
+router.route(`${BASE_URL_AUTH}/`, categoryRoute)
+router.route(`${BASE_URL_AUTH}/`, summaryRoute)
 
 export default router
