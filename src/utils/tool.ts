@@ -28,3 +28,8 @@ export async function fetchCategory(id: string) {
     const [rows] = await db.query<RowDataPacket[]>('SELECT * FROM kategori_budaya WHERE id = ?', [id])
     return rows
 }
+
+export async function fetchAHomeImage(id: string) {
+    const [rows] = await db.query<RowDataPacket[]>('SELECT * FROM home_images WHERE id = ?', [id])
+    return rows
+}
