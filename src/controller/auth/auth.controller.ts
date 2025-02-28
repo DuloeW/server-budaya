@@ -25,7 +25,12 @@ export async function login(c: any) {
 
     const token = await sign(payload(username, expiredIn), secreet)
     setCookie(c, 'token', token)
-    return c.json({ token })
+    return c.json({
+        message: 'Login success',
+        data: {
+            token
+        }
+    })
 }
 
 export async function register(c: any) {
@@ -41,5 +46,10 @@ export async function register(c: any) {
     const id = uuid()
     const hashed = await bcrypt.hash(password, 10)
     await db.query('INSERT INTO users (id, username, password) VALUES (?, ?, ?)', [id, username, hashed])
-    return c.json({ message: 'User created' })
+    return c.json({
+        message: 'Register success',
+        data: {
+            username
+        }
+    })
 }
