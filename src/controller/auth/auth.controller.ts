@@ -5,8 +5,9 @@ import { setCookie } from "hono/cookie";
 import bcrypt from "bcryptjs";
 import { db } from "../../db/connection.js";
 import {v4 as uuid} from 'uuid'
+import type { Context } from "hono";
 
-export async function login(c: any) {
+export async function login(c: Context) {
     const {username, password} = await c.req.json()
      
     const secreet = process.env.SECREET_KEY!
@@ -33,7 +34,7 @@ export async function login(c: any) {
     })
 }
 
-export async function register(c: any) {
+export async function register(c: Context) {
     const {username, password} = await c.req.json()
 
     const users = await fetchUser(username)
